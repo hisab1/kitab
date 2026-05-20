@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Game Transaction Entry</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #050505 0%, #0d0c0e 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+        }
+
+        /* LOGIN CONTAINER */
+        .login-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 360px;
+            width: 100%;
+            padding: 25px;
+            display: none;
+        }
+
+        .login-container.show {
+            display: block;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .login-icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+
+        .login-title {
+            color: #667eea;
+            font-size: 20px;
+            margin-bottom: 3px;
+        }
+
+        .login-subtitle {
+            color: #666;
+            font-size: 13px;
+        }
+
+        /* MAIN APP CONTAINER */
+        .container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-width: 480px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        /* DESKTOP RESPONSIVE (DENSE COMPACT GRID) */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1100px;
+                display: grid;
+                grid-template-columns: 1fr 380px;
+                gap: 20px;
+                padding: 20px;
+            }
+            
+            .sidebar {
+                background: #f8f9fa;
+                padding: 15px;
+                border-radius: 10px;
+                border: 1px solid #e0e0e0;
+                display: flex;
+                flex-direction: column;
+                max-height: 560px;
+            }
+
+            .sidebar h2 {
+                color: #667eea;
+                font-size: 15px;
+                margin-bottom: 12px;
+                border-bottom: 2px solid #667eea;
+                padding-bottom: 5px;
+            }
+
+            .stats-grid {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 8px;
+                margin-bottom: 15px;
+            }
+
+            .stat-card {
+                background: white;
+                padding: 8px 4px;
+                border-radius: 6px;
+                border: 1px solid #e0e0e0;
+                text-align: center;
+            }
+
+            .stat-label {
+                font-size: 9px;
+                color: #666;
+                margin-bottom: 2px;
+                text-transform: uppercase;
+                letter-spacing: 0.3px;
+            }
+
+            .stat-value {
+                font-size: 14px;
+                font-weight: bold;
+                color: #667eea;
+            }
+
+            .recent-transactions {
+                flex: 1;
+                overflow-y: auto;
+                padding-right: 2px;
+            }
+
+            .transaction-item {
+                background: white;
+                padding: 8px 10px;
+                border-radius: 6px;
+                margin-bottom: 6px;
+                border: 1px solid #e0e0e0;
+                font-size: 11px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .transaction-player {
+                font-weight: 600;
+                color: #333;
+            }
+
+            .transaction-details {
+                color: #666;
+                font-size: 10px;
+            }
+
+            .transaction-amount {
+                font-weight: bold;
+                font-size: 12px;
+            }
+
+            .transaction-amount.positive { color: #27ae60; }
+            .transaction-amount.negative { color: #e74c3c; }
+        }
+
+        h1 {
+            color: #667eea;
+            font-size: 20px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 12px;
+            margin-top: 2px;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .logout-btn {
+            padding: 4px 10px;
+            background: #e74c3c;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: background 0.2s;
+            width: auto;
+            margin: 0;
+        }
+
+        .logout-btn:hover { background: #c0392b; }
+
+        .form-group {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: #333;
+            font-weight: 600;
+            font-size: 12px;
+        }
+
+        .required { color: #e74c3c; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 13px;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 45px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.1);
+        }
+
+        .row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            margin-top: 8px;
+        }
+
+        button:hover { opacity: 0.9; }
+        button:disabled { background: #ccc; cursor: not-allowed; opacity: 0.6; }
+
+        .message {
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            display: none;
+            font-size: 12px;
+            text-align: center;
+        }
+
+        .message.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .message.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .message.show { display: block; animation: slideIn 0.2s ease-out; }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .net-display {
+            background: #f8f9fa;
+            padding: 8px;
+            border-radius: 6px;
+            margin-top: 10px;
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .net-label { font-size: 12px; font-weight: 600; color: #666; }
+        .net-amount { font-size: 16px; font-weight: bold; color: #667eea; }
+
+        @media (max-width: 1023px) {
+            .sidebar { margin-top: 20px; border-top: 1px dashed #ccc; padding-top: 15px; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+
+        @media (max-width: 600px) {
+            .container { padding: 15px; }
+            .header-bar { flex-direction: column; align-items: flex-start; gap: 8px; }
+            .user-info { width: 100%; justify-content: space-between; }
+        }
+    </style>
+</head>
+<body>
+    <!-- LOGIN CONTAINER -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-header">
+            <div class="login-icon">🎮</div>
+            <h2 class="login-title">Game Transaction</h2>
+            <p class="login-subtitle">Please login to continue</p>
+        </div>
+        <div id="loginMessage" class="message"></div>
+        <form id="loginForm">
+            <div class="form-group">
+                <label>Username <span class="required">*</span></label>
+                <input type="text" id="loginUsername" required placeholder="Enter username" autocomplete="username">
+            </div>
+            <div class="form-group">
+                <label>Password <span class="required">*</span></label>
+                <input type="password" id="loginPassword" required placeholder="Enter password" autocomplete="current-password">
+            </div>
+            <button type="submit" id="loginBtn">Login</button>
+        </form>
+    </div>
+
+    <!-- MAIN APP CONTAINER -->
+    <div id="mainApp" class="container" style="display: none;">
+        <div class="form-section">
+            <div class="header-bar">
+                <div>
+                    <h1>🎮 Game Transaction</h1>
+                    <p class="subtitle">Record player deposits, bonuses & cashouts</p>
+                </div>
+                <div class="user-info">
+                    <span>👤 <span id="displayUsername"></span></span>
+                    <button class="logout-btn" onclick="logout()">Logout</button>
+                </div>
+            </div>
+
+            <div id="message" class="message"></div>
+
+            <form id="transactionForm">
+                <div class="form-group">
+                    <label>Player Name <span class="required">*</span></label>
+                    <input type="text" id="playerName" required placeholder="Enter player name">
+                </div>
+
+                <div class="form-group">
+                    <label>Game <span class="required">*</span></label>
+                    <select id="game" required>
+                        <option value="">Select game</option>
+                        <option value="Fire Kirin">Fire Kirin</option>
+                        <option value="Milkyway">Milkyway</option>
+                        <option value="Orionstar">Orionstar</option>
+                        <option value="Pandamaster">Pandamaster</option>
+                        <option value="Kraken">Kraken</option>
+                        <option value="Ultra Panda">Ultra Panda</option>
+                        <option value="Vblink">Vblink</option>
+                        <option value="Egame">Egame</option>
+                        <option value="Juwa">Juwa</option>
+                        <option value="Highstake">Highstake</option>
+                        <option value="Gamevault">Gamevault</option>
+                        <option value="River Sweep">River Sweep</option>
+                        <option value="Golden Temple">Golden Temple</option>
+                        <option value="Blue Dragon">Blue Dragon</option>
+                        <option value="Loot">Loot</option>
+                        <option value="Vegas Sweeps">Vegas Sweeps</option>
+                        <option value="Cash Frenzy">Cash Frenzy</option>
+                        <option value="Gameroom">Gameroom</option>
+                        <option value="Cash Machine">Cash Machine</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Deposit Amount</label>
+                        <input type="number" id="depositAmount" placeholder="$ 0" min="0" step="1" oninput="calculateNet()">
+                    </div>
+                    <div class="form-group">
+                        <label>Bonus Amount / FP</label>
+                        <input type="number" id="bonusAmount" placeholder="or FP" min="0" step="1" value="0">
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="form-group">
+                        <label>Cashout Amount</label>
+                        <input type="number" id="cashoutAmount" placeholder="$ 0" min="0" step="1" value="0" oninput="calculateNet()">
+                    </div>
+                    <div class="form-group">
+                        <label>Payment Method <span class="required">*</span></label>
+                        <select id="paymentMethod" required>
+                            <option value="">Select method</option>
+                            <option value="Chime">Chime</option>
+                            <option value="Glark-Chime">Glark-Chime</option>
+                            <option value="BinPay">BinPay</option>
+                            <option value="Cash App">Cash App</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>Remark</label>
+                    <textarea id="remark" placeholder="Optional notes or remarks"></textarea>
+                </div>
+
+                <div class="net-display">
+                    <div class="net-label">Calculated Net (Deposit - Cashout)</div>
+                    <div class="net-amount" id="netAmount">$ 0.00</div>
+                </div>
+
+                <button type="submit" id="submitBtn">Submit Transaction</button>
+            </form>
+        </div>
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h2>📊 Today's Summary</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Deposits</div>
+                    <div class="stat-value" id="statDeposits">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Cashouts</div>
+                    <div class="stat-value" id="statCashouts">$0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Tx Count</div>
+                    <div class="stat-value" id="statCount">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Net Rev</div>
+                    <div class="stat-value" id="statNet">$0</div>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <h2 style="margin: 0; border: none; padding: 0; font-size: 14px;">📝 Transactions</h2>
+                <div style="display: flex; gap: 5px;">
+                    <button onclick="downloadCSV()" style="padding: 4px 8px; font-size: 11px; margin: 0; width: auto; background: #27ae60;">📥 CSV</button>
+                    <button onclick="clearTransactions()" style="padding: 4px 8px; font-size: 11px; margin: 0; width: auto; background: #e74c3c;">🗑️ Clear</button>
+                </div>
+            </div>
+            <div class="recent-transactions" id="recentTransactions">
+                <p style="text-align: center; color: #999; padding: 15px; font-size: 12px;">No transactions yet</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    const AUTH = { username: 'hisab', password: 'kitab' };
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwtZ1e3MpMzuKWaoP-84wkXXzAhprgt4dvjqVvvs7F-z9eeMBR5XUcrhR9LNK66kIGY/exec';
+    let recentTransactions = [];
+
+    function checkAndClearOldData() {
+        const today = new Date().toDateString();
+        const lastDate = localStorage.getItem('transactionDate');
+        if (lastDate && lastDate !== today) {
+            localStorage.removeItem('recentTransactions');
+            localStorage.setItem('transactionDate', today);
+            recentTransactions = [];
+        } else if (!lastDate) {
+            localStorage.setItem('transactionDate', today);
+        }
+    }
+
+    window.onload = function() {
+        checkAndClearOldData();
+        if (sessionStorage.getItem('isLoggedIn') === 'true') {
+            showMainApp();
+            loadRecentTransactions();
+        } else {
+            showLogin();
+        }
+    };
+
+    function showLogin() {
+        document.getElementById('loginContainer').classList.add('show');
+        document.getElementById('mainApp').style.display = 'none';
+    }
+
+    function showMainApp() {
+        document.getElementById('loginContainer').classList.remove('show');
+        document.getElementById('mainApp').style.display = 'grid';
+        document.getElementById('displayUsername').textContent = sessionStorage.getItem('username');
+    }
+
+    function login(username, password) {
+        if (username === AUTH.username && password === AUTH.password) {
+            sessionStorage.setItem('isLoggedIn', 'true');
+            sessionStorage.setItem('username', username);
+            sessionStorage.setItem('loginTime', new Date().toISOString());
+            showMainApp();
+            return true;
+        }
+        return false;
+    }
+
+    function logout() {
+        if (confirm('Are you sure you want to logout?')) {
+            sessionStorage.clear();
+            recentTransactions = [];
+            showLogin();
+        }
+    }
+
+    function downloadCSV() {
+        if (recentTransactions.length === 0) {
+            alert('No transactions to download!');
+            return;
+        }
+        let csv = 'Timestamp,Player Name,Game,Deposit,Bonus/FP,Cashout,Net Amount,Payment Method,Remark\n';
+        recentTransactions.forEach(tx => {
+            csv += `"${tx.timestamp}","${tx.playerName}","${tx.game}",${tx.depositAmount},${tx.bonusAmount},${tx.cashoutAmount},${tx.netAmount},"${tx.paymentMethod}","${tx.remark}"\n`;
+        });
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transactions_${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+        showMessage('✅ CSV file downloaded!', 'success');
+    }
+
+    function clearTransactions() {
+        if (recentTransactions.length === 0) {
+            alert('No transactions to clear!');
+            return;
+        }
+        if (confirm(`Clear all ${recentTransactions.length} transactions? This cannot be undone!`)) {
+            if (confirm('Download CSV backup before clearing?')) {
+                downloadCSV();
+            }
+            recentTransactions = [];
+            localStorage.removeItem('recentTransactions');
+            updateSidebar();
+            showMessage('✅ All transactions cleared!', 'success');
+        }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const username = document.getElementById('loginUsername').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (login(username, password)) {
+            showMessage('✅ Login successful!', 'success', 'loginMessage');
+            loadRecentTransactions();
+        } else {
+            showMessage('❌ Invalid username or password', 'error', 'loginMessage');
+        }
+    });
+
+    // BONUS CORRECTION: Removed bonus calculation variable entirely from final sums
+    function calculateNet() {
+        const deposit = parseFloat(document.getElementById('depositAmount').value) || 0;
+        const cashout = parseFloat(document.getElementById('cashoutAmount').value) || 0;
+        
+        const net = deposit - cashout;
+        document.getElementById('netAmount').textContent = `$ ${net.toFixed(2)}`;
+        
+        const netEl = document.getElementById('netAmount');
+        if (net > 0) { netEl.style.color = '#27ae60'; } 
+        else if (net < 0) { netEl.style.color = '#e74c3c'; } 
+        else { netEl.style.color = '#667eea'; }
+    }
+
+    function showMessage(text, type, elementId = 'message') {
+        const msgEl = document.getElementById(elementId);
+        msgEl.textContent = text;
+        msgEl.className = `message ${type} show`;
+        setTimeout(() => { msgEl.classList.remove('show'); }, 4000);
+    }
+
+    function addToRecentTransactions(data) {
+        const transaction = {
+            playerName: data.playerName,
+            game: data.game,
+            depositAmount: data.depositAmount,
+            bonusAmount: data.bonusAmount, // Kept purely for logging/CSV output records
+            cashoutAmount: data.cashoutAmount,
+            paymentMethod: data.paymentMethod || 'N/A',
+            remark: data.remark || '',
+            netAmount: data.netAmount,
+            timestamp: new Date().toLocaleString(),
+            date: new Date().toDateString()
+        };
+        recentTransactions.unshift(transaction);
+        localStorage.setItem('recentTransactions', JSON.stringify(recentTransactions));
+        updateSidebar();
+    }
+
+    function loadRecentTransactions() {
+        const stored = localStorage.getItem('recentTransactions');
+        if (stored) {
+            recentTransactions = JSON.parse(stored);
+            updateSidebar();
+        }
+    }
+
+    // BONUS CORRECTION: Removed tx.bonusAmount from total computations
+    function updateSidebar() {
+        let totalDeposits = 0;
+        let totalCashouts = 0;
+        let totalNet = 0;
+
+        recentTransactions.forEach(tx => {
+            totalDeposits += tx.depositAmount; 
+            totalCashouts += tx.cashoutAmount;
+            totalNet += tx.netAmount;
+        });
+
+        document.getElementById('statDeposits').textContent = `$${totalDeposits.toFixed(0)}`;
+        document.getElementById('statCashouts').textContent = `$${totalCashouts.toFixed(0)}`;
+        document.getElementById('statCount').textContent = recentTransactions.length;
+        document.getElementById('statNet').textContent = `$${totalNet.toFixed(0)}`;
+
+        const container = document.getElementById('recentTransactions');
+        if (recentTransactions.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: #999; padding: 15px; font-size:12px;">No transactions yet</p>';
+            return;
+        }
+
+        container.innerHTML = recentTransactions.map(tx => `
+            <div class="transaction-item">
+                <div>
+                    <div class="transaction-player">${tx.playerName} <span style="font-weight:normal;color:#777;font-size:10px;">(B: $${tx.bonusAmount})</span></div>
+                    <div class="transaction-details">${tx.game} • ${tx.timestamp.split(',')[1] || tx.timestamp}</div>
+                </div>
+                <div class="transaction-amount ${tx.netAmount >= 0 ? 'positive' : 'negative'}">
+                    $${tx.netAmount.toFixed(0)}
+                </div>
+            </div>
+        `).join('');
+    }
+
+    document.getElementById('transactionForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        if (SCRIPT_URL === 'YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL_HERE') {
+            showMessage('⚠️ Please set your Google Apps Script URL in the code', 'error');
+            return;
+        }
+        
+        const submitBtn = document.getElementById('submitBtn');
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Submitting...';
+        
+        const depositAmount = parseFloat(document.getElementById('depositAmount').value) || 0;
+        const bonusAmount = parseFloat(document.getElementById('bonusAmount').value) || 0;
+        const cashoutAmount = parseFloat(document.getElementById('cashoutAmount').value) || 0;
+        const calculatedNet = depositAmount - cashoutAmount; // BONUS CORRECTION: net metric omits bonus
+        
+        const formData = new URLSearchParams({
+            playerName: document.getElementById('playerName').value.trim(),
+            game: document.getElementById('game').value,
+            depositAmount: depositAmount,
+            bonusAmount: bonusAmount,
+            cashoutAmount: cashoutAmount,
+            paymentMethod: document.getElementById('paymentMethod').value,
+            remark: document.getElementById('remark').value.trim()
+        });
+        
+        try {
+            await fetch(SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors',
+                body: formData
+            });
+            
+            showMessage('✅ Transaction submitted!', 'success');
+            
+            addToRecentTransactions({
+                playerName: document.getElementById('playerName').value.trim(),
+                game: document.getElementById('game').value,
+                depositAmount: depositAmount,
+                bonusAmount: bonusAmount,
+                cashoutAmount: cashoutAmount,
+                paymentMethod: document.getElementById('paymentMethod').value,
+                remark: document.getElementById('remark').value.trim(),
+                netAmount: calculatedNet
+            });
+            
+            document.getElementById('transactionForm').reset();
+            document.getElementById('bonusAmount').value = '0';
+            document.getElementById('cashoutAmount').value = '0';
+            calculateNet();
+                
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage(`❌ Error: ${error.message}`, 'error');
+        } finally {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Submit Transaction';
+        }
+    });
+
+    calculateNet();
+</script>
+</body>
+</html>
